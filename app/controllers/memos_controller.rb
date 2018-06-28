@@ -1,5 +1,7 @@
 class MemosController < ApplicationController
+  include ActionController::HttpAuthentication::Token::ControllerMethods
   before_action :set_memo, only: [:show, :update, :destroy]
+  before_action :authenticate
 
   # GET /memos
   def index
@@ -36,6 +38,13 @@ class MemosController < ApplicationController
   # DELETE /memos/1
   def destroy
     @memo.destroy
+  end
+
+  def authenticate
+    authenticate_or_request_with_http_token do |token, options|
+      auth_user = User.find_by(token: token)
+      auth_user != nil ? true : false
+    end
   end
 
   private
